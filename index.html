@@ -1,12 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>AR Project</title>
+  <title>AR Project 2</title>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.0.12/aframe/build/aframe-ar.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
+  <a-scene embedded arjs="trackingMethod: best;">
+    <!-- Camera with AR.js -->
+    <a-camera-static />
+
+    <!-- Arrow that points towards the box -->
+    <a-entity id="arrow" arrow="to: #box;"></a-entity>
+
+    <!-- 3D Box -->
+    <a-box id="box" position="0 0 -5" material="opacity: 0;"></a-box>
+  </a-scene>
+
   <a-scene embedded arjs="trackingMethod: best;">
     <!-- Camera with AR.js -->
     <a-camera-static />
