@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AR Project</title>
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.0.12/aframe/build/aframe-ar.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+  <a-scene embedded arjs="trackingMethod: best;">
+    <!-- Camera with AR.js -->
+    <a-camera-static />
+
+    <!-- Arrow that points towards the box -->
+    <a-entity id="arrow" arrow="to: #box;"></a-entity>
+
+    <!-- 3D Box -->
+    <a-box id="box" position="0 0 -5" material="opacity: 0;"></a-box>
+  </a-scene>
+
+  <script>
+    AFRAME.registerComponent('arrow', {
+      schema: {
+        to: { type: 'selector' }
+      },
+
+      init: function () {
+        this.camera = document.querySelector('[camera]');
+        this.to = this.data.to;
+
+        this.arrow = document.createElement('a-entity');
+        this.arrow.setAttribute('geometry', { primitive: 'cone', height: 1, radiusBottom: 0.1 });
+        this.arrow.setAttribute('material', 'color: red');
+        this.arrow.object3D.rotation.x = -Math.PI / 2;
+        this.el.appendChild(this.arrow);
+      },
+
+      tick: function () {
+        if (this.to) {
+          const cameraPosition = this.camera.object3D.getWorldPosition();
+          const toPosition = this.to.object3D.getWorldPosition();
+          const direction = toPosition.clone().sub(cameraPosition).normalize();
+
+          this.arrow.object3D.lookAt(toPosition);
+          this.arrow.object3D.position.copy(cameraPosition);
+          this.arrow.object3D.translateZ(-0.5); // Adjust arrow position in front of the camera
+        }
+      }
+    });
+
+    const boxElement = document.getElementById('box');
+    boxElement.addEventListener('model-loaded', () => {
+      // Randomly place the box within 10 meters radius
+      const randomPosition = new THREE.Vector3(
+        Math.random() * 20 - 10,
+        0,
+        Math.random() * 20 - 10
+      );
+      boxElement.object3D.position.copy(randomPosition);
+
+      // Fade in the box
+      fadeObjectIn(boxElement);
+    });
+
+    function fadeObjectIn(object) {
+      let opacity = 0;
+      const fadeInInterval = setInterval(() => {
+        opacity += 0.02;
+        if (opacity >= 1) {
+          clearInterval(fadeInInterval);
+        }
+        object.setAttribute('material', `opacity: ${opacity}`);
+      }, 50);
+    }
+  </script>
+</body>
+</html>
